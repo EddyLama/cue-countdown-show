@@ -2,41 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Professional TV Production Timer Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Control Room Dark Theme */
+    --background: 220 13% 8%;
+    --foreground: 210 20% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 13% 10%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 13% 10%;
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Professional Broadcast Colors */
+    --primary: 142 70% 50%;
+    --primary-foreground: 220 13% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 13% 15%;
+    --secondary-foreground: 210 20% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 13% 12%;
+    --muted-foreground: 210 10% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 93% 47%;
+    --accent-foreground: 220 13% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Alert Colors */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 20% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --warning: 25 95% 53%;
+    --warning-foreground: 220 13% 8%;
 
-    --radius: 0.5rem;
+    /* Professional Timer Display */
+    --timer-active: 142 70% 50%;
+    --timer-warning: 25 95% 53%;
+    --timer-critical: 0 75% 55%;
+    --timer-stopped: 210 10% 65%;
+
+    /* Interface Elements */
+    --border: 220 13% 20%;
+    --input: 220 13% 15%;
+    --ring: 142 70% 50%;
+
+    --radius: 0.375rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +111,52 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
+  }
+
+  /* Professional Timer Display Styles */
+  .timer-display {
+    font-family: 'Courier New', 'Lucida Console', monospace;
+    font-weight: bold;
+    text-shadow: 0 0 20px currentColor;
+    letter-spacing: 0.1em;
+  }
+
+  .timer-glow {
+    filter: drop-shadow(0 0 10px currentColor);
+  }
+
+  .caption-overlay {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(2px);
+  }
+
+  /* Professional Button Animations */
+  .control-button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid hsl(var(--border));
+  }
+
+  .control-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .control-button:active {
+    transform: translateY(0);
+  }
+
+  /* Status Indicators */
+  .status-active {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-glow {
+    from {
+      filter: drop-shadow(0 0 5px currentColor);
+    }
+    to {
+      filter: drop-shadow(0 0 15px currentColor);
+    }
   }
 }
