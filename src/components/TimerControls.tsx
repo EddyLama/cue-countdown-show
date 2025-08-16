@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Play, Pause, Square, RotateCcw } from "lucide-react";
+import { Play, Pause, Square, RotateCcw, Minimize2 } from "lucide-react";
 
 interface TimerControlsProps {
   onStart: () => void;
@@ -12,9 +12,12 @@ interface TimerControlsProps {
   onReset: () => void;
   onSetTime: (minutes: number, seconds: number) => void;
   onSetCaption: (caption: string) => void;
+  onSetEndCaption: (endCaption: string) => void;
+  onToggleFloating: () => void;
   isRunning: boolean;
   timeLeft: number;
   caption: string;
+  endCaption: string;
 }
 
 export const TimerControls = ({
@@ -24,9 +27,12 @@ export const TimerControls = ({
   onReset,
   onSetTime,
   onSetCaption,
+  onSetEndCaption,
+  onToggleFloating,
   isRunning,
   timeLeft,
-  caption
+  caption,
+  endCaption
 }: TimerControlsProps) => {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -52,18 +58,33 @@ export const TimerControls = ({
   return (
     <Card className="p-6 bg-card border-border">
       <div className="space-y-6">
-        {/* Caption Input */}
-        <div className="space-y-2">
-          <Label htmlFor="caption" className="text-sm font-medium">
-            Live Caption
-          </Label>
-          <Input
-            id="caption"
-            value={caption}
-            onChange={(e) => onSetCaption(e.target.value)}
-            placeholder="Enter caption text..."
-            className="bg-input border-border text-foreground"
-          />
+        {/* Caption Inputs */}
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label htmlFor="caption" className="text-sm font-medium">
+              Live Caption
+            </Label>
+            <Input
+              id="caption"
+              value={caption}
+              onChange={(e) => onSetCaption(e.target.value)}
+              placeholder="Enter caption text..."
+              className="bg-input border-border text-foreground"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="endCaption" className="text-sm font-medium">
+              End Caption (shown when timer reaches zero)
+            </Label>
+            <Input
+              id="endCaption"
+              value={endCaption}
+              onChange={(e) => onSetEndCaption(e.target.value)}
+              placeholder="TIME IS UP!"
+              className="bg-input border-border text-foreground"
+            />
+          </div>
         </div>
 
         {/* Time Settings */}
@@ -182,6 +203,15 @@ export const TimerControls = ({
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset
+          </Button>
+          
+          <Button
+            onClick={onToggleFloating}
+            variant="secondary"
+            className="w-full control-button"
+          >
+            <Minimize2 className="w-4 h-4 mr-2" />
+            Floating Window
           </Button>
         </div>
       </div>

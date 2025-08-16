@@ -4,9 +4,10 @@ interface TimerDisplayProps {
   timeLeft: number;
   isRunning: boolean;
   caption: string;
+  endCaption: string;
 }
 
-export const TimerDisplay = ({ timeLeft, isRunning, caption }: TimerDisplayProps) => {
+export const TimerDisplay = ({ timeLeft, isRunning, caption, endCaption }: TimerDisplayProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -55,7 +56,13 @@ export const TimerDisplay = ({ timeLeft, isRunning, caption }: TimerDisplayProps
           </div>
           
           {/* Caption Overlay */}
-          {caption && (
+          {(timeLeft <= 0 && endCaption) ? (
+            <div className="mt-8 px-8 py-4 bg-timer-critical/20 border-2 border-timer-critical rounded-lg backdrop-blur-sm">
+              <div className="caption-overlay text-3xl font-bold text-timer-critical text-center">
+                {endCaption}
+              </div>
+            </div>
+          ) : caption && (
             <div className="mt-8 px-8 py-4 bg-black/50 rounded-lg backdrop-blur-sm">
               <div className="caption-overlay text-2xl font-bold text-white text-center">
                 {caption}

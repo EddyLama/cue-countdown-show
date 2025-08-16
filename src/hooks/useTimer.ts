@@ -7,7 +7,7 @@ export const useTimer = (initialTime: number = 0) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastAlertRef = useRef<number>(-1);
 
-  const playAlert = useCallback((type: 'warning' | 'critical' | 'end') => {
+  const playAlert = useCallback((type: 'start' | 'warning' | 'critical' | 'end') => {
     // Create audio alerts for different timer states
     const context = new (window.AudioContext || (window as any).webkitAudioContext)();
     const oscillator = context.createOscillator();
@@ -17,6 +17,23 @@ export const useTimer = (initialTime: number = 0) => {
     gainNode.connect(context.destination);
 
     switch (type) {
+      case 'start':
+        // Two ascending beeps for start
+        oscillator.frequency.setValueAtTime(600, context.currentTime);
+        gainNode.gain.setValueAtTime(0.4, context.currentTime);
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.2);
+        setTimeout(() => {
+          const osc2 = context.createOscillator();
+          const gain2 = context.createGain();
+          osc2.connect(gain2);
+          gain2.connect(context.destination);
+          osc2.frequency.setValueAtTime(800, context.currentTime);
+          gain2.gain.setValueAtTime(0.4, context.currentTime);
+          osc2.start();
+          osc2.stop(context.currentTime + 0.2);
+        }, 250);
+        break;
       case 'warning':
         oscillator.frequency.setValueAtTime(800, context.currentTime);
         gainNode.gain.setValueAtTime(0.3, context.currentTime);
@@ -85,7 +102,8 @@ export const useTimer = (initialTime: number = 0) => {
 
   const start = useCallback(() => {
     setIsRunning(true);
-  }, []);
+    playAlert('start');
+  }, [playAlert]);
 
   const pause = useCallback(() => {
     setIsRunning(false);
