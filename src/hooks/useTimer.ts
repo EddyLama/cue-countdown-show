@@ -4,6 +4,7 @@ export const useTimer = (initialTime: number = 0) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [isRunning, setIsRunning] = useState(false);
   const [initialTimeSet, setInitialTimeSet] = useState(initialTime);
+  const [allowOvertime, setAllowOvertime] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastAlertRef = useRef<number>(-1);
 
@@ -83,6 +84,12 @@ export const useTimer = (initialTime: number = 0) => {
             lastAlertRef.current = 0;
           }
           
+          // Stop at zero if overtime not allowed
+          if (newTime <= 0 && !allowOvertime) {
+            setIsRunning(false);
+            return 0;
+          }
+          
           return newTime;
         });
       }, 1000);
@@ -98,7 +105,7 @@ export const useTimer = (initialTime: number = 0) => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, playAlert]);
+  }, [isRunning, playAlert, allowOvertime]);
 
   const start = useCallback(() => {
     setIsRunning(true);
@@ -129,13 +136,19 @@ export const useTimer = (initialTime: number = 0) => {
     lastAlertRef.current = -1;
   }, []);
 
+  const toggleOvertime = useCallback(() => {
+    setAllowOvertime(prev => !prev);
+  }, []);
+
   return {
     timeLeft,
     isRunning,
+    allowOvertime,
     start,
     pause,
     stop,
     reset,
-    setTime
+    setTime,
+    toggleOvertime
   };
 };

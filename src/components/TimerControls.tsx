@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Play, Pause, Square, RotateCcw, Minimize2 } from "lucide-react";
 
 interface TimerControlsProps {
@@ -14,10 +15,12 @@ interface TimerControlsProps {
   onSetCaption: (caption: string) => void;
   onSetEndCaption: (endCaption: string) => void;
   onToggleFloating: () => void;
+  onToggleOvertime: () => void;
   isRunning: boolean;
   timeLeft: number;
   caption: string;
   endCaption: string;
+  allowOvertime: boolean;
 }
 
 export const TimerControls = ({
@@ -29,10 +32,12 @@ export const TimerControls = ({
   onSetCaption,
   onSetEndCaption,
   onToggleFloating,
+  onToggleOvertime,
   isRunning,
   timeLeft,
   caption,
-  endCaption
+  endCaption,
+  allowOvertime
 }: TimerControlsProps) => {
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -132,6 +137,18 @@ export const TimerControls = ({
           <Button onClick={handleSetTime} variant="outline" className="w-full control-button">
             Set Timer
           </Button>
+
+          {/* Overtime Option */}
+          <div className="flex items-center space-x-2 pt-2">
+            <Checkbox 
+              id="overtime"
+              checked={allowOvertime}
+              onCheckedChange={onToggleOvertime}
+            />
+            <Label htmlFor="overtime" className="text-sm">
+              Allow overtime counting
+            </Label>
+          </div>
         </div>
 
         {/* Quick Presets */}
@@ -161,6 +178,30 @@ export const TimerControls = ({
               className="control-button"
             >
               1m
+            </Button>
+            <Button
+              onClick={() => handlePresetTime(300)}
+              variant="outline"
+              size="sm"
+              className="control-button"
+            >
+              5m
+            </Button>
+            <Button
+              onClick={() => handlePresetTime(600)}
+              variant="outline"
+              size="sm"
+              className="control-button"
+            >
+              10m
+            </Button>
+            <Button
+              onClick={() => handlePresetTime(1800)}
+              variant="outline"
+              size="sm"
+              className="control-button"
+            >
+              30m
             </Button>
           </div>
         </div>

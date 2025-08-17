@@ -84,18 +84,8 @@ export const FloatingTimer = ({ timeLeft, isRunning, caption, endCaption, onClos
 
       {/* Timer Content */}
       <div className="p-4">
-        <div className={`timer-display text-4xl font-bold text-center mb-2 ${getTimerColor()}`}>
+        <div className={`timer-display text-4xl font-bold text-center ${getTimerColor()}`}>
           {formatTime(timeLeft)}
-        </div>
-        
-        {displayCaption && (
-          <div className="text-center text-sm font-medium bg-muted rounded px-3 py-2">
-            {displayCaption}
-          </div>
-        )}
-        
-        <div className="mt-3 text-xs text-muted-foreground text-center">
-          Drag to move • Web version (for true always-on-top, use mobile app)
         </div>
       </div>
     </div>
