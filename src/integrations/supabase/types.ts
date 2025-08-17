@@ -14,7 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      screens: {
+        Row: {
+          connected: boolean
+          created_at: string
+          id: string
+          last_seen: string
+          name: string
+          session_id: string
+        }
+        Insert: {
+          connected?: boolean
+          created_at?: string
+          id?: string
+          last_seen?: string
+          name: string
+          session_id: string
+        }
+        Update: {
+          connected?: boolean
+          created_at?: string
+          id?: string
+          last_seen?: string
+          name?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "screens_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "timer_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      timer_sessions: {
+        Row: {
+          allow_overtime: boolean
+          caption: string | null
+          controller_id: string | null
+          created_at: string
+          end_caption: string | null
+          id: string
+          initial_time: number
+          is_running: boolean
+          room_code: string
+          time_left: number
+          updated_at: string
+        }
+        Insert: {
+          allow_overtime?: boolean
+          caption?: string | null
+          controller_id?: string | null
+          created_at?: string
+          end_caption?: string | null
+          id?: string
+          initial_time?: number
+          is_running?: boolean
+          room_code: string
+          time_left?: number
+          updated_at?: string
+        }
+        Update: {
+          allow_overtime?: boolean
+          caption?: string | null
+          controller_id?: string | null
+          created_at?: string
+          end_caption?: string | null
+          id?: string
+          initial_time?: number
+          is_running?: boolean
+          room_code?: string
+          time_left?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

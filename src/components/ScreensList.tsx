@@ -6,16 +6,23 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Monitor, Trash2 } from "lucide-react";
-import { useScreens } from "@/hooks/useScreens";
+import type { Database } from "@/integrations/supabase/types";
 
-export const ScreensList = () => {
-  const { screens, addScreen, removeScreen } = useScreens();
+type Screen = Database['public']['Tables']['screens']['Row'];
+
+interface ScreensListProps {
+  screens: Screen[];
+  onAddScreen: (name: string) => Promise<void>;
+  onRemoveScreen: (id: string) => Promise<void>;
+}
+
+export const ScreensList = ({ screens, onAddScreen, onRemoveScreen }: ScreensListProps) => {
   const [newScreenName, setNewScreenName] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const handleAddScreen = () => {
+  const handleAddScreen = async () => {
     if (newScreenName.trim()) {
-      addScreen(newScreenName.trim());
+      await onAddScreen(newScreenName.trim());
       setNewScreenName("");
       setIsAddDialogOpen(false);
     }
@@ -79,7 +86,7 @@ export const ScreensList = () => {
                   <div>
                     <div className="text-sm font-medium">{screen.name}</div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(screen.lastSeen).toLocaleTimeString()}
+                      {new Date(screen.last_seen).toLocaleTimeString()}
                     </div>
                   </div>
                 </div>
@@ -90,7 +97,7 @@ export const ScreensList = () => {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => removeScreen(screen.id)}
+                    onClick={() => onRemoveScreen(screen.id)}
                     className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                   >
                     <Trash2 className="w-3 h-3" />
