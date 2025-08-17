@@ -5,53 +5,18 @@ import { FloatingTimer } from "@/components/FloatingTimer";
 import { ScreensList } from "@/components/ScreensList";
 import { useTimer } from "@/hooks/useTimer";
 import { useScreens } from "@/hooks/useScreens";
-import { useTimerSession } from "@/hooks/useTimerSession";
 
 const Index = () => {
   const { timeLeft, isRunning, allowOvertime, start, pause, stop, reset, setTime, toggleOvertime } = useTimer(60);
+  const { syncTimerState } = useScreens();
   const [caption, setCaption] = useState("");
   const [endCaption, setEndCaption] = useState("TIME IS UP!");
   const [showFloating, setShowFloating] = useState(false);
-  const [roomCode] = useState("MAIN"); // Default room code
-  
-  // Initialize timer session
-  const { session, createSession, updateTimerState } = useTimerSession();
-  const { screens, addScreen, removeScreen } = useScreens(session?.id);
 
-  // Create session on mount
+  // Sync timer state to all connected screens
   useEffect(() => {
-    createSession(roomCode);
-  }, [createSession, roomCode]);
-
-  // Sync local timer state with Supabase when changes occur
-  useEffect(() => {
-    if (session) {
-      updateTimerState({
-        time_left: timeLeft,
-        is_running: isRunning,
-        allow_overtime: allowOvertime,
-        caption,
-        end_caption: endCaption
-      });
-    }
-  }, [timeLeft, isRunning, allowOvertime, caption, endCaption, session, updateTimerState]);
-
-  // Update local timer from session changes (from other screens)
-  useEffect(() => {
-    if (session && !isRunning) {
-      // Only sync from remote if we're not currently running locally
-      // This prevents conflicts when the timer is actively running
-      if (session.time_left !== timeLeft) {
-        setTime(Math.floor(session.time_left / 60), session.time_left % 60);
-      }
-      if (session.caption !== caption) {
-        setCaption(session.caption || "");
-      }
-      if (session.end_caption !== endCaption) {
-        setEndCaption(session.end_caption || "TIME IS UP!");
-      }
-    }
-  }, [session, isRunning]);
+    syncTimerState({ timeLeft, isRunning, caption, endCaption });
+  }, [timeLeft, isRunning, caption, endCaption, syncTimerState]);
 
   const toggleFloating = () => {
     setShowFloating(!showFloating);
@@ -72,11 +37,7 @@ const Index = () => {
         
         {/* Screens List in bottom area */}
         <div className="p-4 border-t border-border">
-          <ScreensList 
-            screens={screens}
-            onAddScreen={addScreen}
-            onRemoveScreen={removeScreen}
-          />
+          <ScreensList />
         </div>
       </div>
 

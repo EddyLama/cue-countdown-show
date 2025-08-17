@@ -1,133 +1,54 @@
-import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import { useState } from "react";
 
-type Screen = Database['public']['Tables']['screens']['Row'];
+export interface Screen {
+  id: string;
+  name: string;
+  connected: boolean;
+  lastSeen: string;
+}
 
-export const useScreens = (sessionId?: string) => {
+export const useScreens = () => {
   const [screens, setScreens] = useState<Screen[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isController] = useState(true);
 
-  // Add a new screen to the session
-  const addScreen = useCallback(async (name: string) => {
-    if (!sessionId) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('screens')
-        .insert({
-          session_id: sessionId,
-          name,
-          connected: true,
-          last_seen: new Date().toISOString()
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      
-      // Local state will be updated by realtime subscription
-    } catch (error) {
-      console.error('Error adding screen:', error);
-    }
-  }, [sessionId]);
-
-  // Remove a screen
-  const removeScreen = useCallback(async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('screens')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      
-      // Local state will be updated by realtime subscription
-    } catch (error) {
-      console.error('Error removing screen:', error);
-    }
-  }, []);
-
-  // Load screens for the session
-  const loadScreens = useCallback(async () => {
-    if (!sessionId) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('screens')
-        .select('*')
-        .eq('session_id', sessionId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setScreens(data || []);
-    } catch (error) {
-      console.error('Error loading screens:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [sessionId]);
-
-  // Subscribe to real-time updates for screens
-  useEffect(() => {
-    if (!sessionId) return;
-
-    const channel = supabase
-      .channel(`screens_${sessionId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'screens',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setScreens(prev => [...prev, payload.new as Screen]);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'screens',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setScreens(prev => prev.filter(screen => screen.id !== payload.old.id));
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'screens',
-          filter: `session_id=eq.${sessionId}`,
-        },
-        (payload) => {
-          setScreens(prev => prev.map(screen => 
-            screen.id === payload.new.id ? payload.new as Screen : screen
-          ));
-        }
-      )
-      .subscribe();
-
-    // Load initial data
-    loadScreens();
-
-    return () => {
-      supabase.removeChannel(channel);
+  const addScreen = (name: string) => {
+    const newScreen = {
+      id: crypto.randomUUID(),
+      name,
+      connected: true,
+      lastSeen: new Date().toISOString()
     };
-  }, [sessionId, loadScreens]);
+
+    setScreens(prev => [...prev, newScreen]);
+  };
+
+  const removeScreen = (id: string) => {
+    setScreens(prev => prev.filter(s => s.id !== id));
+  };
+
+  const syncTimerState = (timerState: {
+    timeLeft: number;
+    isRunning: boolean;
+    caption: string;
+    endCaption: string;
+  }) => {
+    if (!isController) return;
+    
+    // For now, just log the timer state
+    // This will be enhanced with real-time sync later
+    console.log('Timer state synced:', timerState);
+  };
+
+  const loadScreens = () => {
+    // Mock function for now
+  };
 
   return {
     screens,
-    loading,
+    isController,
     addScreen,
     removeScreen,
+    syncTimerState,
     loadScreens
   };
 };
