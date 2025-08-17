@@ -13,9 +13,9 @@ export const ScreensList = () => {
   const [newScreenName, setNewScreenName] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const handleAddScreen = async () => {
+  const handleAddScreen = () => {
     if (newScreenName.trim()) {
-      await addScreen(newScreenName.trim());
+      addScreen(newScreenName.trim());
       setNewScreenName("");
       setIsAddDialogOpen(false);
     }

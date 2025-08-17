@@ -1,10 +1,4 @@
-import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!
-);
+import { useState } from "react";
 
 export interface Screen {
   id: string;
@@ -15,49 +9,9 @@ export interface Screen {
 
 export const useScreens = () => {
   const [screens, setScreens] = useState<Screen[]>([]);
-  const [isController, setIsController] = useState(true);
+  const [isController] = useState(true);
 
-  useEffect(() => {
-    // Subscribe to screens changes
-    const channel = supabase
-      .channel('screens')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'screens'
-      }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setScreens(prev => [...prev, payload.new as Screen]);
-        } else if (payload.eventType === 'DELETE') {
-          setScreens(prev => prev.filter(s => s.id !== payload.old.id));
-        } else if (payload.eventType === 'UPDATE') {
-          setScreens(prev => prev.map(s => 
-            s.id === payload.new.id ? payload.new as Screen : s
-          ));
-        }
-      })
-      .subscribe();
-
-    // Load initial screens
-    loadScreens();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, []);
-
-  const loadScreens = async () => {
-    const { data, error } = await supabase
-      .from('screens')
-      .select('*')
-      .order('name');
-    
-    if (data && !error) {
-      setScreens(data);
-    }
-  };
-
-  const addScreen = async (name: string) => {
+  const addScreen = (name: string) => {
     const newScreen = {
       id: crypto.randomUUID(),
       name,
@@ -65,51 +19,33 @@ export const useScreens = () => {
       lastSeen: new Date().toISOString()
     };
 
-    const { error } = await supabase
-      .from('screens')
-      .insert([newScreen]);
-
-    if (error) {
-      console.error('Error adding screen:', error);
-    }
+    setScreens(prev => [...prev, newScreen]);
   };
 
-  const removeScreen = async (id: string) => {
-    const { error } = await supabase
-      .from('screens')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error removing screen:', error);
-    }
+  const removeScreen = (id: string) => {
+    setScreens(prev => prev.filter(s => s.id !== id));
   };
 
-  const syncTimerState = async (timerState: {
+  const syncTimerState = (timerState: {
     timeLeft: number;
     isRunning: boolean;
     caption: string;
     endCaption: string;
   }) => {
     if (!isController) return;
+    
+    // For now, just log the timer state
+    // This will be enhanced with real-time sync later
+    console.log('Timer state synced:', timerState);
+  };
 
-    const { error } = await supabase
-      .from('timer_state')
-      .upsert([{
-        id: 'main',
-        ...timerState,
-        updated_at: new Date().toISOString()
-      }]);
-
-    if (error) {
-      console.error('Error syncing timer state:', error);
-    }
+  const loadScreens = () => {
+    // Mock function for now
   };
 
   return {
     screens,
     isController,
-    setIsController,
     addScreen,
     removeScreen,
     syncTimerState,
