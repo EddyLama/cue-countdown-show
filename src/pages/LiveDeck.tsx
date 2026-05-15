@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useLiveDeck } from "@/stores/liveDeckStore";
 import { MultiViewWall } from "@/components/livedeck/MultiViewWall";
 import { ProgramPreview } from "@/components/livedeck/ProgramPreview";
@@ -6,24 +5,13 @@ import { SwitcherPanel } from "@/components/livedeck/SwitcherPanel";
 import { AudioMixer } from "@/components/livedeck/AudioMixer";
 import { GraphicsPanel } from "@/components/livedeck/GraphicsPanel";
 import { RundownStrip } from "@/components/livedeck/RundownStrip";
+import { useShortcuts } from "@/stores/shortcutsStore";
+import { formatKey } from "@/lib/shortcuts";
 
 const LiveDeck = () => {
-  const { cameras, setPreview, take, cut } = useLiveDeck();
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.code === "Space") { e.preventDefault(); take(); return; }
-      if (e.code === "Enter") { e.preventDefault(); cut(); return; }
-      const n = Number(e.key);
-      if (n >= 1 && n <= cameras.length) {
-        const cam = cameras[n - 1];
-        if (cam?.alive) setPreview(cam.id);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [cameras, take, cut, setPreview]);
+  const { cameras } = useLiveDeck();
+  const bindings = useShortcuts((s) => s.bindings);
+  const openCheatSheet = useShortcuts((s) => s.openCheatSheet);
 
   return (
     <div className="flex flex-1 min-h-0">
@@ -43,9 +31,12 @@ const LiveDeck = () => {
         <SwitcherPanel />
         <AudioMixer />
         <div className="text-[10px] text-muted-foreground text-center font-mono">
-          Shortcuts: <kbd className="px-1 bg-secondary rounded">1-9</kbd> preview cam ·
-          {" "}<kbd className="px-1 bg-secondary rounded">Space</kbd> TAKE ·
-          {" "}<kbd className="px-1 bg-secondary rounded">Enter</kbd> CUT
+          <kbd className="px-1 bg-secondary rounded">{formatKey(bindings.take)}</kbd> TAKE ·{" "}
+          <kbd className="px-1 bg-secondary rounded">{formatKey(bindings.cut)}</kbd> CUT ·{" "}
+          <kbd className="px-1 bg-secondary rounded">1-9</kbd> preview cam ·{" "}
+          <button onClick={openCheatSheet} className="underline hover:text-foreground">
+            View all shortcuts ({formatKey(bindings.openCheatSheet)})
+          </button>
         </div>
       </main>
 
