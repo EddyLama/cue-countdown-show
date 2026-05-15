@@ -18,17 +18,20 @@ const Library = () => {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="p-6 max-w-[1600px] mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Media Library &amp; Session Setup</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Assign video clips to virtual camera slots and edit your show rundown.
         </p>
+        <p className="text-xs text-muted-foreground mt-1">professional broadcast control by Ohriginal LLC ©2025</p>
       </div>
 
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
       <Card className="p-5 bg-panel border-border">
         <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4">Camera Slots</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
           {cameras.map((c) => (
             <div key={c.id} className="border border-border rounded-md p-3 bg-secondary/40">
               <div className="flex items-center justify-between mb-2">
@@ -141,6 +144,8 @@ const Library = () => {
           </Button>
         </div>
       </Card>
+      </div>
+      </div>
     </div>
   );
 };
