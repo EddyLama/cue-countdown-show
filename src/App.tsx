@@ -10,18 +10,24 @@ import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
 import { AppHeader } from "./components/livedeck/AppHeader";
 import { TrainerPanel } from "./components/livedeck/TrainerPanel";
+import { ShortcutsDialog } from "./components/livedeck/ShortcutsDialog";
+import { useGlobalShortcuts } from "./hooks/useShortcuts";
 
 const queryClient = new QueryClient();
 
-const Shell = () => (
-  <div className="h-screen flex flex-col bg-background overflow-hidden">
-    <AppHeader />
-    <div className="flex-1 flex flex-col min-h-0">
-      <Outlet />
+const Shell = () => {
+  useGlobalShortcuts();
+  return (
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
+      <AppHeader />
+      <div className="flex-1 flex flex-col min-h-0">
+        <Outlet />
+      </div>
+      <TrainerPanel />
+      <ShortcutsDialog />
     </div>
-    <TrainerPanel />
-  </div>
-);
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
