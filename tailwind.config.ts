@@ -62,6 +62,26 @@ export default {
 					critical: 'hsl(var(--timer-critical))',
 					stopped: 'hsl(var(--timer-stopped))'
 				},
+				program: {
+					DEFAULT: 'hsl(var(--program))',
+					foreground: 'hsl(var(--program-foreground))'
+				},
+				preview: {
+					DEFAULT: 'hsl(var(--preview))',
+					foreground: 'hsl(var(--preview-foreground))'
+				},
+				trainer: {
+					DEFAULT: 'hsl(var(--trainer))',
+					foreground: 'hsl(var(--trainer-foreground))'
+				},
+				cue: {
+					DEFAULT: 'hsl(var(--cue))',
+					foreground: 'hsl(var(--cue-foreground))'
+				},
+				panel: {
+					DEFAULT: 'hsl(var(--panel))',
+					elev: 'hsl(var(--panel-elev))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
