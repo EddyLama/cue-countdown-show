@@ -31,9 +31,12 @@ const LiveDeck = () => {
         <SwitcherPanel />
         <AudioMixer />
         <div className="text-[10px] text-muted-foreground text-center font-mono">
-          Shortcuts: <kbd className="px-1 bg-secondary rounded">1-9</kbd> preview cam ·
-          {" "}<kbd className="px-1 bg-secondary rounded">Space</kbd> TAKE ·
-          {" "}<kbd className="px-1 bg-secondary rounded">Enter</kbd> CUT
+          <kbd className="px-1 bg-secondary rounded">{formatKey(bindings.take)}</kbd> TAKE ·{" "}
+          <kbd className="px-1 bg-secondary rounded">{formatKey(bindings.cut)}</kbd> CUT ·{" "}
+          <kbd className="px-1 bg-secondary rounded">1-9</kbd> preview cam ·{" "}
+          <button onClick={openCheatSheet} className="underline hover:text-foreground">
+            View all shortcuts ({formatKey(bindings.openCheatSheet)})
+          </button>
         </div>
       </main>
 

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useLiveDeck } from "@/stores/liveDeckStore";
 import { Button } from "@/components/ui/button";
-import { Layers, Timer, Tv2, GraduationCap, BarChart3, FolderOpen, Radio } from "lucide-react";
+import { Layers, Timer, Tv2, GraduationCap, BarChart3, FolderOpen, Radio, Keyboard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useShortcuts } from "@/stores/shortcutsStore";
 
 const fmtClock = (ms: number) => {
   const t = Math.max(0, Math.floor(ms / 1000));
@@ -28,6 +29,7 @@ const tabs = [
 
 export const AppHeader = () => {
   const { pgm, cameras, trainer, toggleTrainerPanel, session, rundown } = useLiveDeck();
+  const openCheatSheet = useShortcuts((s) => s.openCheatSheet);
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const i = setInterval(() => setNow(Date.now()), 250);
@@ -101,6 +103,16 @@ export const AppHeader = () => {
         <span className="text-[9px] uppercase font-bold tracking-widest text-cue">Score</span>
         <span className="font-mono text-sm font-bold text-cue">{trainer.score.value}</span>
       </div>
+
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={openCheatSheet}
+        className="h-9 w-9 p-0"
+        title="Keyboard shortcuts"
+      >
+        <Keyboard className="w-4 h-4" />
+      </Button>
 
       <Button
         size="sm"
