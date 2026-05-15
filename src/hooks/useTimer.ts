@@ -5,7 +5,7 @@ export const useTimer = (initialTime: number = 0) => {
   const [isRunning, setIsRunning] = useState(false);
   const [initialTimeSet, setInitialTimeSet] = useState(initialTime);
   const [allowOvertime, setAllowOvertime] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastAlertRef = useRef<number>(-1);
 
   const playAlert = useCallback((type: 'start' | 'warning' | 'critical' | 'end') => {
