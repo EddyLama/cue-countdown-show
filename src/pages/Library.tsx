@@ -144,6 +144,8 @@ const Library = () => {
           </Button>
         </div>
       </Card>
+      </div>
+      </div>
     </div>
   );
 };
