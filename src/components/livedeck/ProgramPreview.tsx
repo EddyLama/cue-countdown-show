@@ -110,7 +110,7 @@ const Monitor = ({ bus }: { bus: Bus }) => {
     const store = useLiveDeck.getState();
     const spec: TransitionSpec = {
       family: store.transition.type,
-      variant: store.transition.variant || undefined,
+      variant: (store.transition.variant || undefined) as any,
       durationMs: store.transition.durationMs,
     };
 
