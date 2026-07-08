@@ -1,29 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* LiveDeck Pro Design System — broadcast control room */
+/* LiveDeck Pro Design System — broadcast control room, neumorphic hardware */
 
 @layer base {
   :root {
-    --background: 220 30% 6%;
+    --background: 220 22% 8%;
     --foreground: 210 20% 95%;
 
-    --card: 220 28% 8%;
+    --card: 220 22% 10%;
     --card-foreground: 210 20% 95%;
 
-    --popover: 220 28% 9%;
+    --popover: 220 22% 10%;
     --popover-foreground: 210 20% 95%;
 
     --primary: 142 70% 50%;
     --primary-foreground: 220 13% 8%;
 
-    --secondary: 220 20% 14%;
+    --secondary: 220 18% 14%;
     --secondary-foreground: 210 20% 95%;
 
-    --muted: 220 20% 12%;
-    --muted-foreground: 215 14% 60%;
+    --muted: 220 18% 12%;
+    --muted-foreground: 215 14% 62%;
 
     --accent: 45 93% 47%;
     --accent-foreground: 220 13% 8%;
@@ -48,16 +48,29 @@
     --trainer-foreground: 0 0% 100%;
     --cue: 38 100% 51%;
     --cue-foreground: 30 100% 6%;
-    --panel: 220 28% 9%;
-    --panel-elev: 220 24% 11%;
+    --panel: 220 22% 10%;
+    --panel-elev: 220 20% 12%;
 
-    --border: 220 20% 16%;
-    --input: 220 20% 14%;
+    /* Neumorphic surface system */
+    --surface: 220 20% 11%;
+    --surface-raised: 220 20% 14%;
+    --surface-inset: 220 26% 6%;
+    --bevel-hi: 220 30% 22%;
+    --bevel-lo: 220 40% 3%;
+
+    /* LEDs */
+    --led-red: 354 100% 60%;
+    --led-green: 142 80% 52%;
+    --led-amber: 38 100% 55%;
+    --led-blue: 210 100% 60%;
+
+    --border: 220 18% 16%;
+    --input: 220 18% 14%;
     --ring: 240 78% 62%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 220 28% 8%;
+    --sidebar-background: 220 22% 10%;
     --sidebar-foreground: 210 20% 95%;
     --sidebar-primary: 240 78% 62%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -74,8 +87,12 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 0%, hsl(220 30% 14% / 0.7), transparent 55%),
+      radial-gradient(circle at 100% 100%, hsl(240 30% 12% / 0.55), transparent 55%);
   }
   .font-mono, .timer-display { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .font-hw { font-family: 'Rajdhani', 'Inter', sans-serif; letter-spacing: 0.08em; }
 
   .timer-display {
     font-weight: 700;
@@ -86,6 +103,232 @@
   .caption-overlay {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
     backdrop-filter: blur(2px);
+  }
+
+  /* ============================================================
+     Neumorphic hardware primitives
+     ============================================================ */
+
+  .neo-panel {
+    background:
+      linear-gradient(160deg, hsl(var(--surface-raised)) 0%, hsl(var(--surface)) 100%);
+    border: 1px solid hsl(var(--bevel-lo));
+    border-radius: 14px;
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--bevel-hi) / 0.55),
+      inset 0 -1px 0 0 hsl(var(--bevel-lo) / 0.9),
+      0 10px 30px -12px hsl(0 0% 0% / 0.7),
+      0 2px 4px hsl(0 0% 0% / 0.35);
+    position: relative;
+  }
+
+  .neo-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+    background: linear-gradient(180deg,
+      hsl(220 24% 16%) 0%,
+      hsl(220 22% 12%) 100%);
+    border-bottom: 1px solid hsl(var(--bevel-lo));
+    box-shadow: inset 0 1px 0 hsl(var(--bevel-hi) / 0.4);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .neo-screw {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, hsl(220 15% 40%) 0%, hsl(220 20% 10%) 70%);
+    box-shadow:
+      inset 0 1px 1px hsl(0 0% 0% / 0.9),
+      inset 0 -1px 1px hsl(220 30% 50% / 0.4),
+      0 1px 2px hsl(0 0% 0% / 0.5);
+  }
+  .neo-screw::after {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: linear-gradient(45deg, transparent 45%, hsl(220 10% 5%) 45%, hsl(220 10% 5%) 55%, transparent 55%);
+    border-radius: 50%;
+  }
+
+  .neo-inset {
+    background:
+      linear-gradient(180deg, hsl(var(--surface-inset)) 0%, hsl(220 28% 8%) 100%);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 2px 4px hsl(0 0% 0% / 0.9),
+      inset 0 -1px 0 hsl(var(--bevel-hi) / 0.15),
+      0 1px 0 hsl(var(--bevel-hi) / 0.3);
+    border: 1px solid hsl(var(--bevel-lo));
+  }
+
+  .neo-raised {
+    background: linear-gradient(180deg,
+      hsl(220 20% 18%) 0%,
+      hsl(220 22% 12%) 100%);
+    border: 1px solid hsl(var(--bevel-lo));
+    border-radius: 8px;
+    box-shadow:
+      inset 0 1px 0 hsl(var(--bevel-hi) / 0.6),
+      inset 0 -1px 0 hsl(var(--bevel-lo)),
+      0 3px 6px hsl(0 0% 0% / 0.5),
+      0 1px 0 hsl(var(--bevel-hi) / 0.15);
+  }
+
+  .neo-button {
+    background: linear-gradient(180deg,
+      hsl(220 22% 20%) 0%,
+      hsl(220 22% 13%) 100%);
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--bevel-lo));
+    border-radius: 6px;
+    box-shadow:
+      inset 0 1px 0 hsl(var(--bevel-hi) / 0.55),
+      inset 0 -1px 0 hsl(var(--bevel-lo)),
+      0 2px 3px hsl(0 0% 0% / 0.5);
+    transition: all 0.12s ease;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .neo-button:hover:not(:disabled) {
+    background: linear-gradient(180deg,
+      hsl(220 22% 24%) 0%,
+      hsl(220 22% 15%) 100%);
+  }
+  .neo-button:active:not(:disabled), .neo-button[data-pressed="true"] {
+    background: linear-gradient(180deg,
+      hsl(220 22% 10%) 0%,
+      hsl(220 22% 15%) 100%);
+    box-shadow:
+      inset 0 2px 4px hsl(0 0% 0% / 0.9),
+      inset 0 -1px 0 hsl(var(--bevel-hi) / 0.15);
+    transform: translateY(1px);
+  }
+
+  .brushed-metal {
+    background:
+      repeating-linear-gradient(90deg,
+        hsl(220 10% 20%) 0px,
+        hsl(220 12% 22%) 1px,
+        hsl(220 10% 18%) 2px,
+        hsl(220 12% 22%) 3px),
+      linear-gradient(180deg, hsl(220 15% 24%) 0%, hsl(220 15% 14%) 100%);
+    box-shadow:
+      inset 0 1px 0 hsl(220 20% 32% / 0.6),
+      inset 0 -1px 0 hsl(0 0% 0% / 0.6);
+  }
+
+  /* LED */
+  .neo-led {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: hsl(220 15% 18%);
+    box-shadow: inset 0 1px 1px hsl(0 0% 0%), inset 0 -1px 1px hsl(220 20% 30%);
+    display: inline-block;
+  }
+  .neo-led[data-on="true"] {
+    background: radial-gradient(circle at 35% 30%, hsl(var(--led-color, var(--led-green)) / 1) 0%, hsl(var(--led-color, var(--led-green)) / 0.5) 60%, hsl(var(--led-color, var(--led-green)) / 0.15) 100%);
+    box-shadow:
+      0 0 6px 1px hsl(var(--led-color, var(--led-green)) / 0.85),
+      0 0 14px 2px hsl(var(--led-color, var(--led-green)) / 0.35),
+      inset 0 0 3px hsl(0 0% 100% / 0.6);
+  }
+
+  /* Knob visuals — actual behavior via component */
+  .neo-knob-body {
+    background:
+      radial-gradient(circle at 30% 25%, hsl(220 15% 32%) 0%, hsl(220 20% 14%) 60%, hsl(220 25% 8%) 100%);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 -3px 6px hsl(0 0% 0% / 0.8),
+      inset 0 3px 6px hsl(220 30% 40% / 0.4),
+      0 4px 8px hsl(0 0% 0% / 0.65),
+      0 1px 0 hsl(var(--bevel-hi) / 0.4);
+    position: relative;
+  }
+  .neo-knob-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background:
+      conic-gradient(from -135deg,
+        hsl(var(--knob-color, var(--trainer))) var(--knob-fill, 0%),
+        hsl(220 30% 8%) var(--knob-fill, 0%));
+    mask: radial-gradient(circle, transparent 55%, black 56%, black 100%);
+    -webkit-mask: radial-gradient(circle, transparent 55%, black 56%, black 100%);
+    filter: drop-shadow(0 0 4px hsl(var(--knob-color, var(--trainer)) / 0.5));
+  }
+  .neo-knob-indicator {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    width: 2px;
+    height: 32%;
+    background: hsl(var(--knob-color, var(--trainer)));
+    border-radius: 2px;
+    transform-origin: 50% 130%;
+    box-shadow: 0 0 6px hsl(var(--knob-color, var(--trainer)));
+  }
+
+  /* Fader */
+  .neo-fader-track {
+    background:
+      linear-gradient(180deg, hsl(220 28% 6%) 0%, hsl(220 22% 10%) 100%);
+    box-shadow:
+      inset 0 2px 4px hsl(0 0% 0% / 0.95),
+      inset 0 -1px 0 hsl(var(--bevel-hi) / 0.15);
+    border-radius: 4px;
+    border: 1px solid hsl(var(--bevel-lo));
+  }
+  .neo-fader-cap {
+    background: linear-gradient(180deg,
+      hsl(220 15% 34%) 0%,
+      hsl(220 18% 22%) 40%,
+      hsl(220 20% 12%) 60%,
+      hsl(220 18% 22%) 100%);
+    border: 1px solid hsl(0 0% 0%);
+    border-radius: 4px;
+    box-shadow:
+      inset 0 1px 0 hsl(220 20% 50% /0.7),
+      inset 0 -1px 0 hsl(0 0% 0% /0.8),
+      0 3px 6px hsl(0 0% 0% / 0.7),
+      0 0 0 1px hsl(220 25% 5%);
+    position: relative;
+  }
+  .neo-fader-cap::after {
+    content: "";
+    position: absolute;
+    left: 8%; right: 8%;
+    top: 50%;
+    height: 2px;
+    background: hsl(var(--cue));
+    box-shadow: 0 0 6px hsl(var(--cue) / 0.9);
+    transform: translateY(-50%);
+    border-radius: 1px;
+  }
+
+  /* Screen — used for digital readouts and video frames */
+  .neo-screen {
+    background:
+      linear-gradient(180deg, hsl(140 40% 4%) 0%, hsl(140 40% 6%) 100%);
+    border: 1px solid hsl(0 0% 0%);
+    border-radius: 4px;
+    box-shadow:
+      inset 0 2px 6px hsl(0 0% 0% / 0.95),
+      0 1px 0 hsl(var(--bevel-hi) / 0.3);
+    color: hsl(var(--cue));
+    text-shadow: 0 0 8px hsl(var(--cue) / 0.7);
+    font-family: 'JetBrains Mono', monospace;
   }
 
   .control-button {
@@ -113,7 +356,7 @@
     50%     { opacity: .35; }
   }
 
-  /* Vertical slider for audio faders */
+  /* Vertical slider for audio faders (fallback) */
   input.fader-vertical {
     -webkit-appearance: slider-vertical;
     writing-mode: vertical-lr;
@@ -121,5 +364,9 @@
     width: 28px;
     cursor: pointer;
     background: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live-dot, .status-active { animation: none !important; }
   }
 }
