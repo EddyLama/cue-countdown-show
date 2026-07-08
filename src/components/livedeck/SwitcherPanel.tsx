@@ -1,116 +1,57 @@
-import { useLiveDeck, type TransitionType } from "@/stores/liveDeckStore";
-import { Button } from "@/components/ui/button";
+import { useLiveDeck } from "@/stores/liveDeckStore";
+import { PanelFrame } from "./hardware/PanelFrame";
+import { Led } from "./hardware/Led";
 import { cn } from "@/lib/utils";
 
-const TRANSITIONS: TransitionType[] = ["cut", "mix", "wipe", "dve", "sting"];
-
+/** Bus rows only — transition controls moved to TransitionPanel. */
 export const SwitcherPanel = () => {
-  const { cameras, pgm, pvw, setPreview, take, transition, setTransitionType, setTransitionDuration, setTbar } =
-    useLiveDeck();
+  const { cameras, pgm, pvw, setPreview } = useLiveDeck();
+
+  const Row = ({
+    label, activeId, onPick, color,
+  }: {
+    label: string; activeId: string;
+    onPick?: (id: string) => void;
+    color: "program" | "preview";
+  }) => (
+    <div className="flex items-center gap-1.5">
+      <div className={cn(
+        "w-14 text-[10px] font-hw font-bold tracking-widest font-mono shrink-0 text-center py-1.5 rounded",
+        color === "program" ? "bg-program/10 text-program border border-program/30"
+                            : "bg-preview/10 text-preview border border-preview/30"
+      )}>
+        {label}
+      </div>
+      {cameras.map((c) => {
+        const active = c.id === activeId;
+        return (
+          <button
+            key={c.id}
+            disabled={!c.alive}
+            onClick={() => onPick?.(c.id)}
+            data-pressed={active}
+            className={cn(
+              "neo-button flex-1 h-10 font-mono text-[13px] flex flex-col items-center justify-center gap-0.5",
+              active && color === "program" && "text-program",
+              active && color === "preview" && "text-preview",
+              !c.alive && "opacity-40 cursor-not-allowed"
+            )}
+            style={active ? {
+              boxShadow: `inset 0 2px 4px hsl(0 0% 0%/0.9), 0 0 12px hsl(var(--${color})/0.5), inset 0 0 0 1px hsl(var(--${color})/0.5)`,
+            } : undefined}
+          >
+            <Led on={active} color={color === "program" ? "red" : "green"} size={5} pulse={active && color === "program"} />
+            <span className="leading-none font-bold">{c.label.replace("CAM ", "")}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
 
   return (
-    <div className="bg-panel-elev border border-border rounded-lg p-3 flex flex-col gap-3">
-      {/* PGM bus */}
-      <div className="flex items-center gap-1.5">
-        <div className="w-12 text-[10px] font-bold tracking-wider text-program font-mono shrink-0">PGM</div>
-        {cameras.map((c) => {
-          const active = c.id === pgm;
-          return (
-            <button
-              key={c.id}
-              disabled={!c.alive}
-              className={cn(
-                "flex-1 h-9 rounded-md font-mono text-[12px] font-bold border transition-all",
-                active
-                  ? "bg-program text-program-foreground border-program shadow-[0_0_12px_hsl(var(--program)/0.5)]"
-                  : "bg-secondary text-muted-foreground border-border hover:text-foreground",
-                !c.alive && "opacity-40 cursor-not-allowed"
-              )}
-            >
-              {c.label.replace("CAM ", "")}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* PVW bus */}
-      <div className="flex items-center gap-1.5">
-        <div className="w-12 text-[10px] font-bold tracking-wider text-preview font-mono shrink-0">PVW</div>
-        {cameras.map((c) => {
-          const active = c.id === pvw;
-          return (
-            <button
-              key={c.id}
-              disabled={!c.alive}
-              onClick={() => setPreview(c.id)}
-              className={cn(
-                "flex-1 h-9 rounded-md font-mono text-[12px] font-bold border transition-all",
-                active
-                  ? "bg-preview/20 text-preview border-preview"
-                  : "bg-secondary text-muted-foreground border-border hover:text-foreground",
-                !c.alive && "opacity-40 cursor-not-allowed"
-              )}
-            >
-              {c.label.replace("CAM ", "")}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Transitions row */}
-      <div className="flex items-center gap-3 pt-3 border-t border-border">
-        <div className="flex gap-1 bg-background p-1 rounded-md border border-border">
-          {TRANSITIONS.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTransitionType(t)}
-              className={cn(
-                "h-7 px-3 text-[10px] font-bold uppercase tracking-wider rounded transition-colors",
-                transition.type === t
-                  ? "bg-trainer text-trainer-foreground shadow-[0_1px_6px_hsl(var(--trainer)/0.4)]"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2 flex-1">
-          <span className="text-[9px] uppercase tracking-widest font-bold text-muted-foreground">T-Bar</span>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={transition.tbar}
-            onChange={(e) => setTbar(Number(e.target.value))}
-            onMouseUp={(e) => {
-              if (Number((e.target as HTMLInputElement).value) > 50) setTbar(100);
-              else setTbar(0);
-            }}
-            className="flex-1 h-1.5 accent-trainer"
-          />
-          <span className="text-[10px] font-mono text-muted-foreground w-10 text-center">
-            {(transition.durationMs / 1000).toFixed(1)}s
-          </span>
-          <input
-            type="range"
-            min={200}
-            max={3000}
-            step={100}
-            value={transition.durationMs}
-            onChange={(e) => setTransitionDuration(Number(e.target.value))}
-            className="w-20 h-1 accent-muted-foreground"
-          />
-        </div>
-
-        <Button
-          onClick={take}
-          className="h-10 px-7 bg-program hover:bg-program/90 text-program-foreground font-bold tracking-widest text-sm shadow-[0_3px_14px_hsl(var(--program)/0.4)]"
-        >
-          TAKE
-        </Button>
-      </div>
-    </div>
+    <PanelFrame title="M/E Switcher — Bus" bodyClassName="p-3 space-y-2">
+      <Row label="PGM" activeId={pgm} color="program" />
+      <Row label="PVW" activeId={pvw} onPick={setPreview} color="preview" />
+    </PanelFrame>
   );
 };
