@@ -198,8 +198,9 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
     get().adjustScore(1, "cut");
   },
 
-  transition: { type: "cut", durationMs: 1000, tbar: 0 },
-  setTransitionType: (t) => set((s) => ({ transition: { ...s.transition, type: t } })),
+  transition: { type: "mix", variant: "", durationMs: 1000, tbar: 0 },
+  setTransitionType: (t) => set((s) => ({ transition: { ...s.transition, type: t, variant: "" } })),
+  setTransitionVariant: (v) => set((s) => ({ transition: { ...s.transition, variant: v } })),
   setTransitionDuration: (ms) => set((s) => ({ transition: { ...s.transition, durationMs: ms } })),
   setTbar: (v) => {
     set((s) => ({ transition: { ...s.transition, tbar: v } }));
@@ -214,6 +215,10 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
     set((s) => ({
       audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, level } : c)) },
     })),
+  setChannelParam: (id, key, v) =>
+    set((s) => ({
+      audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, [key]: v } : c)) },
+    })),
   toggleMute: (id) => {
     set((s) => ({
       audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, mute: !c.mute } : c)) },
@@ -224,7 +229,17 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
     set((s) => ({
       audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, solo: !c.solo } : c)) },
     })),
+  toggleArm: (id) =>
+    set((s) => ({
+      audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, armed: !c.armed } : c)) },
+    })),
   setMaster: (v) => set((s) => ({ audio: { ...s.audio, master: v } })),
+  setChannelLevels: (id, rms, peak) =>
+    set((s) => ({
+      audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, vu: rms, peak } : c)) },
+    })),
+  setMasterLevels: (rms, peak) =>
+    set((s) => ({ audio: { ...s.audio, masterVu: rms, masterPeak: peak } as any })),
 
   tickVU: () =>
     set((s) => ({
@@ -232,7 +247,7 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
         ...s.audio,
         channels: s.audio.channels.map((c) => {
           const target = c.mute ? 0 : Math.min(100, c.level * (0.5 + Math.random() * 0.6));
-          return { ...c, vu: c.vu * 0.6 + target * 0.4 };
+          return { ...c, vu: c.vu * 0.6 + target * 0.4, peak: Math.max(c.peak * 0.9, c.vu) };
         }),
       },
     })),
