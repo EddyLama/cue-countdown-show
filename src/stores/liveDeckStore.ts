@@ -70,17 +70,22 @@ interface LiveDeckState {
   cut: () => void;
 
   // Transition
-  transition: { type: TransitionType; durationMs: number; tbar: number };
+  transition: { type: TransitionType; variant: TransitionVariant; durationMs: number; tbar: number };
   setTransitionType: (t: TransitionType) => void;
+  setTransitionVariant: (v: TransitionVariant) => void;
   setTransitionDuration: (ms: number) => void;
   setTbar: (v: number) => void;
 
   // Audio
   audio: { channels: AudioChannel[]; master: number };
   setChannelLevel: (id: string, level: number) => void;
+  setChannelParam: (id: string, key: "pan" | "low" | "mid" | "high" | "compThreshold" | "compRatio", v: number) => void;
   toggleMute: (id: string) => void;
   toggleSolo: (id: string) => void;
+  toggleArm: (id: string) => void;
   setMaster: (v: number) => void;
+  setChannelLevels: (id: string, rms: number, peak: number) => void;
+  setMasterLevels: (rms: number, peak: number) => void;
   tickVU: () => void;
 
   // Graphics
