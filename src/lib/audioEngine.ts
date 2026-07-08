@@ -31,7 +31,7 @@ interface ChannelNodes {
   high: BiquadFilterNode;
   comp: DynamicsCompressorNode;
   analyser: AnalyserNode;
-  buf: Float32Array;
+  buf: Float32Array<ArrayBuffer>;
   peakHold: number;
   peakDecayAt: number;
   attachedEl?: HTMLMediaElement;
@@ -41,7 +41,7 @@ class AudioEngine {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private masterAnalyser: AnalyserNode | null = null;
-  private masterBuf: Float32Array = new Float32Array(1024);
+  private masterBuf: Float32Array<ArrayBuffer> = new Float32Array(new ArrayBuffer(1024 * 4));
   private channels = new Map<string, ChannelNodes>();
   private masterPeak = 0;
   private masterPeakAt = 0;
@@ -105,7 +105,7 @@ class AudioEngine {
       high,
       comp,
       analyser,
-      buf: new Float32Array(analyser.fftSize),
+      buf: new Float32Array(new ArrayBuffer(analyser.fftSize * 4)),
       peakHold: 0,
       peakDecayAt: 0,
     };
