@@ -8,15 +8,24 @@ export interface Camera {
   alive: boolean;      // false when "camera dies" challenge fires
 }
 
-export type TransitionType = "cut" | "mix" | "wipe" | "dve" | "sting";
+export type TransitionType = "cut" | "mix" | "wipe" | "dve" | "sting" | "ftb";
+export type TransitionVariant = string; // free-form variant id per family
 
 export interface AudioChannel {
   id: string;
   label: string;
-  level: number;     // 0-100
+  level: number;     // 0-100 fader
+  pan: number;       // -50..50
+  low: number;       // -12..12 dB
+  mid: number;
+  high: number;
+  compThreshold: number; // -60..0
+  compRatio: number;     // 1..20
   mute: boolean;
   solo: boolean;
-  vu: number;        // 0-100, animated
+  armed: boolean;
+  vu: number;        // 0-100 RMS
+  peak: number;      // 0-100 peak-hold
 }
 
 export interface Cue {
@@ -61,17 +70,22 @@ interface LiveDeckState {
   cut: () => void;
 
   // Transition
-  transition: { type: TransitionType; durationMs: number; tbar: number };
+  transition: { type: TransitionType; variant: TransitionVariant; durationMs: number; tbar: number };
   setTransitionType: (t: TransitionType) => void;
+  setTransitionVariant: (v: TransitionVariant) => void;
   setTransitionDuration: (ms: number) => void;
   setTbar: (v: number) => void;
 
   // Audio
   audio: { channels: AudioChannel[]; master: number };
   setChannelLevel: (id: string, level: number) => void;
+  setChannelParam: (id: string, key: "pan" | "low" | "mid" | "high" | "compThreshold" | "compRatio", v: number) => void;
   toggleMute: (id: string) => void;
   toggleSolo: (id: string) => void;
+  toggleArm: (id: string) => void;
   setMaster: (v: number) => void;
+  setChannelLevels: (id: string, rms: number, peak: number) => void;
+  setMasterLevels: (rms: number, peak: number) => void;
   tickVU: () => void;
 
   // Graphics
@@ -119,13 +133,20 @@ const defaultCameras = (): Camera[] =>
     alive: true,
   }));
 
+const makeChannel = (id: string, label: string, level: number, freq = 220): AudioChannel => ({
+  id, label, level,
+  pan: 0, low: 0, mid: 0, high: 0,
+  compThreshold: -18, compRatio: 3,
+  mute: false, solo: false, armed: false,
+  vu: 0, peak: 0,
+});
 const defaultChannels = (): AudioChannel[] => [
-  { id: "ch1", label: "MIC 1", level: 75, mute: false, solo: false, vu: 0 },
-  { id: "ch2", label: "MIC 2", level: 70, mute: false, solo: false, vu: 0 },
-  { id: "ch3", label: "GTR",   level: 60, mute: false, solo: false, vu: 0 },
-  { id: "ch4", label: "BED",   level: 55, mute: false, solo: false, vu: 0 },
-  { id: "ch5", label: "FX",    level: 50, mute: false, solo: false, vu: 0 },
-  { id: "ch6", label: "PGM",   level: 80, mute: false, solo: false, vu: 0 },
+  makeChannel("ch1", "MIC 1", 75),
+  makeChannel("ch2", "MIC 2", 70),
+  makeChannel("ch3", "GTR",   60),
+  makeChannel("ch4", "BED",   55),
+  makeChannel("ch5", "FX",    50),
+  makeChannel("ch6", "PGM",   80),
 ];
 
 const defaultRundown = (): Cue[] => [
@@ -177,8 +198,9 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
     get().adjustScore(1, "cut");
   },
 
-  transition: { type: "cut", durationMs: 1000, tbar: 0 },
-  setTransitionType: (t) => set((s) => ({ transition: { ...s.transition, type: t } })),
+  transition: { type: "mix", variant: "", durationMs: 1000, tbar: 0 },
+  setTransitionType: (t) => set((s) => ({ transition: { ...s.transition, type: t, variant: "" } })),
+  setTransitionVariant: (v) => set((s) => ({ transition: { ...s.transition, variant: v } })),
   setTransitionDuration: (ms) => set((s) => ({ transition: { ...s.transition, durationMs: ms } })),
   setTbar: (v) => {
     set((s) => ({ transition: { ...s.transition, tbar: v } }));
@@ -193,6 +215,10 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
     set((s) => ({
       audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, level } : c)) },
     })),
+  setChannelParam: (id, key, v) =>
+    set((s) => ({
+      audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, [key]: v } : c)) },
+    })),
   toggleMute: (id) => {
     set((s) => ({
       audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, mute: !c.mute } : c)) },
@@ -203,7 +229,17 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
     set((s) => ({
       audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, solo: !c.solo } : c)) },
     })),
+  toggleArm: (id) =>
+    set((s) => ({
+      audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, armed: !c.armed } : c)) },
+    })),
   setMaster: (v) => set((s) => ({ audio: { ...s.audio, master: v } })),
+  setChannelLevels: (id, rms, peak) =>
+    set((s) => ({
+      audio: { ...s.audio, channels: s.audio.channels.map((c) => (c.id === id ? { ...c, vu: rms, peak } : c)) },
+    })),
+  setMasterLevels: (rms, peak) =>
+    set((s) => ({ audio: { ...s.audio, masterVu: rms, masterPeak: peak } as any })),
 
   tickVU: () =>
     set((s) => ({
@@ -211,7 +247,7 @@ export const useLiveDeck = create<LiveDeckState>((set, get) => ({
         ...s.audio,
         channels: s.audio.channels.map((c) => {
           const target = c.mute ? 0 : Math.min(100, c.level * (0.5 + Math.random() * 0.6));
-          return { ...c, vu: c.vu * 0.6 + target * 0.4 };
+          return { ...c, vu: c.vu * 0.6 + target * 0.4, peak: Math.max(c.peak * 0.9, c.vu) };
         }),
       },
     })),
