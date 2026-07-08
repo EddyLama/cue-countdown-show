@@ -8,15 +8,24 @@ export interface Camera {
   alive: boolean;      // false when "camera dies" challenge fires
 }
 
-export type TransitionType = "cut" | "mix" | "wipe" | "dve" | "sting";
+export type TransitionType = "cut" | "mix" | "wipe" | "dve" | "sting" | "ftb";
+export type TransitionVariant = string; // free-form variant id per family
 
 export interface AudioChannel {
   id: string;
   label: string;
-  level: number;     // 0-100
+  level: number;     // 0-100 fader
+  pan: number;       // -50..50
+  low: number;       // -12..12 dB
+  mid: number;
+  high: number;
+  compThreshold: number; // -60..0
+  compRatio: number;     // 1..20
   mute: boolean;
   solo: boolean;
-  vu: number;        // 0-100, animated
+  armed: boolean;
+  vu: number;        // 0-100 RMS
+  peak: number;      // 0-100 peak-hold
 }
 
 export interface Cue {
