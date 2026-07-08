@@ -128,13 +128,20 @@ const defaultCameras = (): Camera[] =>
     alive: true,
   }));
 
+const makeChannel = (id: string, label: string, level: number, freq = 220): AudioChannel => ({
+  id, label, level,
+  pan: 0, low: 0, mid: 0, high: 0,
+  compThreshold: -18, compRatio: 3,
+  mute: false, solo: false, armed: false,
+  vu: 0, peak: 0,
+});
 const defaultChannels = (): AudioChannel[] => [
-  { id: "ch1", label: "MIC 1", level: 75, mute: false, solo: false, vu: 0 },
-  { id: "ch2", label: "MIC 2", level: 70, mute: false, solo: false, vu: 0 },
-  { id: "ch3", label: "GTR",   level: 60, mute: false, solo: false, vu: 0 },
-  { id: "ch4", label: "BED",   level: 55, mute: false, solo: false, vu: 0 },
-  { id: "ch5", label: "FX",    level: 50, mute: false, solo: false, vu: 0 },
-  { id: "ch6", label: "PGM",   level: 80, mute: false, solo: false, vu: 0 },
+  makeChannel("ch1", "MIC 1", 75),
+  makeChannel("ch2", "MIC 2", 70),
+  makeChannel("ch3", "GTR",   60),
+  makeChannel("ch4", "BED",   55),
+  makeChannel("ch5", "FX",    50),
+  makeChannel("ch6", "PGM",   80),
 ];
 
 const defaultRundown = (): Cue[] => [
